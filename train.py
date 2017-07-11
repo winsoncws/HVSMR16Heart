@@ -66,7 +66,7 @@ if __name__ == '__main__':
     valid_cost_background = (1 - smooth_iou(y_ph_cat[:,:,:,:,0] , y_test_sb[:,:,:,:,0]) ) # can ignore 
     valid_cost_label = (1 - smooth_iou(y_ph_cat[:,:,:,:,1] , y_test_sb[:,:,:,:,0]) ) 
     valid_cost_others = (1 - smooth_iou(y_ph_cat[:,:,:,:,2] , y_test_sb[:,:,:,:,1]) )
-    test_cost_sb = tf.reduce_sum([valid_cost_label * 0.7,valid_cost_others * 0.3])  
+    test_cost_sb = tf.reduce_sum([valid_cost_label * 0.5,valid_cost_others * 0.5])  
     
     
     # ACCURACY
@@ -159,8 +159,8 @@ if __name__ == '__main__':
             mean_valid_2 = tt_valid_2/float(ttl_examples)
             print('\nvalid average cost', mean_valid_cost)
             #print('valid Background', mean_valid_0)
-            print('valid WMH', mean_valid_1)
-            print('valid Others', mean_valid_2)
+            print('valid Label1', mean_valid_1)
+            print('valid Label2', mean_valid_2)
             print('valid accu', mean_valid_accu)
             
             
@@ -180,21 +180,26 @@ if __name__ == '__main__':
         #print("Model saved in file: %s" % save_path)
         
         
-#        ### 1ST PREDICTION
-#        predictIndex = sys.argv[1] # input from terminal
-#        print('Prediction 3D Scan of No #'+predictIndex)        
-#        intIndex = int(predictIndex)  
-#        
-#        feed_dict = {X_ph:X_test[intIndex].reshape((1,)+X_test[0].shape)}
-#        mask_output = sess.run(y_test_sb, feed_dict=feed_dict)
-#
-#        print('mask_outpt type')        
-#        print(type(mask_output))
-#        print(mask_output.shape)        
-#        
-#        np.save('X_test_'+predictIndex+'.npy',X_test[intIndex])
-#        np.save('y_test_'+predictIndex+'.npy',y_test[intIndex])
-#        np.save('mask_output_'+predictIndex+'.npy',mask_output[0])
+        ### 1ST PREDICTION
+        #predictIndex = sys.argv[1] # input from terminal
+        for i in range(4):
+            print('Prediction 3D Scan of No #'+str(i))        
+            intIndex = int(i)  
+            X_tr = X_train[i]
+            y_tr = y_train[i]
+            X_tr = X_tr.reshape((1,)+X_tr.shape+(1,))
+            y_tr = y_tr.reshape((1,)+y_tr.shape+(1,))
+            feed_dict = {X_ph:X_tr, y_ph:y_tr, phase:0}        
+            
+            mask_output = sess.run(y_test_sb, feed_dict=feed_dict)
+    
+            print('mask_outpt type')        
+            print(type(mask_output))
+            print(mask_output.shape)        
+            
+            np.save('X_test_'+str(i)+'.npy',X_train[i])
+            np.save('y_test_'+str(i)+'.npy',y_train[i])
+            np.save('mask_output_'+str(i)+'.npy',mask_output[0])
         
         
         
