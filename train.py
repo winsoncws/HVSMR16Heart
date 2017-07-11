@@ -56,8 +56,8 @@ if __name__ == '__main__':
     
     print('TRAINED')
 
-    print(y_ph_cat.shape)
-    print(y_test_sb.shape)
+    print(y_ph_cat)
+    print(y_test_sb)
     ### CHANGE TO 2 CHANNELS
     train_cost_label =  (1 - smooth_iou(y_ph_cat[:,:,:,:,1] , y_train_sb[:,:,:,:,0]) ) 
     train_cost_others = (1 - smooth_iou(y_ph_cat[:,:,:,:,2] , y_train_sb[:,:,:,:,1]) ) 
@@ -115,6 +115,8 @@ if __name__ == '__main__':
             for i in range(10):
                 X_tr = X_train[i]
                 y_tr = y_train[i]
+                y_tr = np.array(y_tr, dtype='int8')
+                wwwww
                 X_tr = X_tr.reshape((1,)+X_tr.shape+(1,))
                 y_tr = y_tr.reshape((1,)+y_tr.shape+(1,))
                 feed_dict = {X_ph:X_tr, y_ph:y_tr, phase:1}
