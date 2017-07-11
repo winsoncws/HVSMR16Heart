@@ -116,7 +116,7 @@ if __name__ == '__main__':
                 X_tr = X_train[i]
                 y_tr = y_train[i]
                 y_tr = np.array(y_tr, dtype='int8')
-                wwwww
+                
                 X_tr = X_tr.reshape((1,)+X_tr.shape+(1,))
                 y_tr = y_tr.reshape((1,)+y_tr.shape+(1,))
                 feed_dict = {X_ph:X_tr, y_ph:y_tr, phase:1}
