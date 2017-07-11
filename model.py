@@ -59,11 +59,11 @@ def maxPool3D(input, ksize, stride, padding='SAME'):
     return output, getShape(output)
 
 
-phase = tf.placeholder(tf.bool, name='phase')
+#phase = tf.placeholder(tf.bool, name='phase')
 
 def batchNorm(input, training=True):
     return tf.contrib.layers.batch_norm(input, decay=0.9, epsilon=1e-5,
-                                        scale=True, is_training=training, scope='bn')
+                                        scale=True, is_training=training, scope=None)
 
 def dense_batch_relu(x, phase, scope):
     with tf.variable_scope(scope):
@@ -77,6 +77,7 @@ def dense_batch_relu(x, phase, scope):
         return tf.nn.relu(h2, 'relu')               
                
 def batch_relu(x, phase, scope):
+#    tf.nn.fused_batch_norm
     with tf.variable_scope(scope):
         out = tf.contrib.layers.batch_norm(x, center=True, scale=True, is_training=phase, scope='BN')
         return tf.nn.relu(out, 'ReLU')     
@@ -89,7 +90,7 @@ def model(input, train=True):
         poolStride = (2,2,2)
         poolSize = (2,2,2)
         inputChannel = 1
-        input = tf.placeholder('float32', [None, 20, 20, 20, 1])
+        #input = tf.placeholder('float32', [None, 20, 20, 20, 1])
         conv1= conv3d(input, channels=inputChannel, filters=8, ksize=kSize3, stride=convStride)
         print('----------')
         print(conv1.name)
