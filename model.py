@@ -79,7 +79,7 @@ def dense_batch_relu(x, phase, scope):
 def batch_relu(x, phase, scope):
 #    tf.nn.fused_batch_norm
     with tf.variable_scope(scope):
-        out = tf.contrib.layers.batch_norm(x, center=True, scale=True, is_training=phase, scope='BN')
+        out = tf.contrib.layers.batch_norm(x, center=True, scale=True, is_training=phase, scope=None)
         return tf.nn.relu(out, 'ReLU')     
 
 
@@ -94,8 +94,8 @@ def model(input, train=True):
         conv1= conv3d(input, channels=inputChannel, filters=8, ksize=kSize3, stride=convStride)
         print('----------')
         print(conv1.name)
-        conv1, shape2 = maxPool3D(conv1,poolSize,poolStride,'SAME')
-        conv1 = batchNorm(conv1, training=train)
+        #conv1, shape2 = maxPool3D(conv1,poolSize,poolStride,'SAME')
+        conv1 = batch_relu(conv1, training=train)
         conv1 = conv3d(conv1, channels=8, filters=16, ksize=kSize3, stride=convStride)
         print(conv1.shape)
         conv1 = conv3d(conv1, channels=conv1.shape[4].value, filters=8, ksize=kSize3, stride=convStride)
