@@ -56,6 +56,8 @@ def conv3d_Tr(input, channels, filters, output, ksize, stride, padding='SAME'):
     # output : b,d,h,w,out
     filter_shape = ksize + (filters, channels)
     batch_size = tf.shape(input)[0]
+    print('output -----')
+    print(output)
     d,h,w = output
     output_shape = tf.stack((batch_size, int(d), int(h), int(w), filters))
     #output_shape = (batch_size,d,h,w,filters)
@@ -101,6 +103,7 @@ def model(input, train=True):
         inputChannel = 1
         #input = tf.placeholder('float32', [None, 20, 20, 20, 1])
         shape1 = getShape(input)
+        print(shape1)
         conv1= conv3d(input, channels=inputChannel, filters=8, ksize=kSize3, stride=convStride)
         print('----------')
         print(conv1.shape)
