@@ -62,11 +62,11 @@ def locateCenter(label):
 #showImage(data,segment,slice, cmap_='CMRmap')
 #showImage(data,segment,slice, cmap_='CMRmap', vmin=0 ,vmax=3000) # might need to do clipping
 #
-#path = "axial_crop"
-#for index in range(10):
-#    volumeFile = "./datasetHVSMR16Heart/"+path+"/TrainingDataset/training_"+path+"_pat"
-#    data = sitk.GetArrayFromImage(sitk.ReadImage(volumeFile+str(index)+'.nii.gz'))
-#    print(data.shape)
+path = "axial_crop"
+for index in range(10):
+    volumeFile = "./datasetHVSMR16Heart/"+path+"/TrainingDataset/training_"+path+"_pat"
+    data = sitk.GetArrayFromImage(sitk.ReadImage(volumeFile+str(index)+'.nii.gz'))
+    print(data.shape)
 
 
 class HVSMRdataset():
@@ -122,7 +122,17 @@ class HVSMRdataset():
         segment = sitk.GetArrayFromImage(sitk.ReadImage(segmentFile))
         data = sitk.GetArrayFromImage(sitk.ReadImage(volumeFile))
         self.__pltImage(data, segment, index=slice)
-        
+    
+    def padding(self,x,dim=(181,239,165)):
+        dataShape = x.shape
+        d1 = int(np.ceil((dim[0]-dataShape[0])/2.0))
+        d2 = int(np.floor((dim[0]-dataShape[0])/2.0))
+        w1 = int(np.ceil((dim[1]-dataShape[1])/2.0))
+        w2 = int(np.floor((dim[1]-dataShape[1])/2.0))
+        h1 = int(np.ceil((dim[2]-dataShape[2])/2.0))
+        h2 = int(np.floor((dim[2]-dataShape[2])/2.0))
+        return np.pad(x,[[d1,d2],[w1,w2],[h1,h2]],'constant')    
+    
     def __nextBatch(self,batchSize,dataset='train'):
         assert len(self.listFolder) > 0, 'Please initialize dataset first, by calling InitDataset()'
         if dataset == 'train':
@@ -157,10 +167,10 @@ class HVSMRdataset():
         print('fetching '+dataset+' rawdata from drive')
         # maxValue = 3300.0
         maxValue = 1.0
-#        segmentData_ = [self.padding(sitk.GetArrayFromImage(sitk.ReadImage(i)))/maxValue for i in segmentPath]  
-#        volumeData_ = [self.padding(sitk.GetArrayFromImage(sitk.ReadImage(i)))/maxValue for i in volumePath]  
-        segmentData_ = [sitk.GetArrayFromImage(sitk.ReadImage(i))/maxValue for i in segmentPath]  
-        volumeData_ = [sitk.GetArrayFromImage(sitk.ReadImage(i))/maxValue for i in volumePath] 
+        segmentData_ = [self.padding(sitk.GetArrayFromImage(sitk.ReadImage(i)))/maxValue for i in segmentPath]  
+        volumeData_ = [self.padding(sitk.GetArrayFromImage(sitk.ReadImage(i)))/maxValue for i in volumePath]  
+        #segmentData_ = [sitk.GetArrayFromImage(sitk.ReadImage(i))/maxValue for i in segmentPath]  
+        #volumeData_ = [sitk.GetArrayFromImage(sitk.ReadImage(i))/maxValue for i in volumePath] 
         segmentData_ = np.array(segmentData_)
         volumeData_ = np.array(volumeData_)
         return volumeData_, segmentData_
