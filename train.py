@@ -25,7 +25,7 @@ if __name__ == '__main__':
     
     max_epoch = 100
     es = tg.EarlyStopper(max_epoch=max_epoch,
-                         epoch_look_back=3,
+                         epoch_look_back=4,
                          percent_decrease=0)
 
 
@@ -59,14 +59,15 @@ if __name__ == '__main__':
     print(y_ph_cat)
     print(y_test_sb)
     ### CHANGE TO 2 CHANNELS
-    train_cost_label =  (1 - smooth_iou(y_ph_cat[:,:,:,:,1] , y_train_sb[:,:,:,:,0]) ) 
-    train_cost_others = (1 - smooth_iou(y_ph_cat[:,:,:,:,2] , y_train_sb[:,:,:,:,1]) ) 
-    train_cost_sb = tf.reduce_sum([train_cost_label * 0.5,train_cost_others * 0.5])
+    train_cost_back =  (1 - smooth_iou(y_ph_cat[:,:,:,:,0] , y_train_sb[:,:,:,:,0]) ) 
+    train_cost_label =  (1 - smooth_iou(y_ph_cat[:,:,:,:,1] , y_train_sb[:,:,:,:,1]) ) 
+    train_cost_others = (1 - smooth_iou(y_ph_cat[:,:,:,:,2] , y_train_sb[:,:,:,:,2]) ) 
+    train_cost_sb = tf.reduce_sum([train_cost_back*0.3,train_cost_label * 0.4,train_cost_others * 0.4])
     #train_cost_sb = train_cost_label
-    valid_cost_background = (1 - smooth_iou(y_ph_cat[:,:,:,:,0] , y_test_sb[:,:,:,:,0]) ) # can ignore 
-    valid_cost_label = (1 - smooth_iou(y_ph_cat[:,:,:,:,1] , y_test_sb[:,:,:,:,0]) ) 
-    valid_cost_others = (1 - smooth_iou(y_ph_cat[:,:,:,:,2] , y_test_sb[:,:,:,:,1]) )
-    test_cost_sb = tf.reduce_sum([valid_cost_label * 0.5,valid_cost_others * 0.5])  
+    valid_cost_back = (1 - smooth_iou(y_ph_cat[:,:,:,:,0] , y_test_sb[:,:,:,:,0]) ) # can ignore 
+    valid_cost_label = (1 - smooth_iou(y_ph_cat[:,:,:,:,1] , y_test_sb[:,:,:,:,1]) ) 
+    valid_cost_others = (1 - smooth_iou(y_ph_cat[:,:,:,:,2] , y_test_sb[:,:,:,:,2]) )
+    test_cost_sb = tf.reduce_sum([valid_cost_back*0.3,valid_cost_label * 0.4,valid_cost_others * 0.4]) 
     
     
     # ACCURACY
@@ -141,7 +142,7 @@ if __name__ == '__main__':
                 X_tr = X_tr.reshape((1,)+X_tr.shape+(1,))
                 y_tr = y_tr.reshape((1,)+y_tr.shape+(1,))
                 feed_dict = {X_ph:X_tr, y_ph:y_tr, phase:0}
-                valid_cost, valid_accu, valid_0, valid_1, valid_2 = sess.run([test_cost_sb, test_accu_sb, valid_cost_background,
+                valid_cost, valid_accu, valid_0, valid_1, valid_2 = sess.run([test_cost_sb, test_accu_sb, valid_cost_back,
                                                                      valid_cost_label, valid_cost_others],
                                                                      feed_dict=feed_dict)
                 #mask_output = sess.run(y_test_sb, feed_dict=feed_dict)

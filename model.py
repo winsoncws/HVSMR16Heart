@@ -24,46 +24,51 @@ InceptionResnet_3D, ResidualBlock3D
 
 from tensorflow.python.ops import gen_nn_ops
 
-#class model3D(Sequential):
-#    def __init__(self):
-#        with tf.name_scope('WMH'):
-#            pass   
-#    def filter(self,shape):
-#        return tf.Variable(tf.random_normal(shape, stddev=0.1),
-#                                      name=self.__class__.__name__ + '_filter')   
-#    def bias(self,size):
-#        return tf.Variable(tf.zeros([size]), name=self.__class__.__name__ + '_b')
-
 
 def filter(shape):
     return tf.Variable(tf.random_normal(shape, stddev=0.1), name='filter')  
     
 def bias(size):
     return tf.Variable(tf.zeros([size]), name='_b')                                
-    
-def conv3d(input, channels, filters, ksize, stride, padding='SAME'):
-    filter_shape = ksize + (channels, filters)
-    filter = tf.Variable(tf.random_normal(filter_shape, stddev=0.1), name='filter')
-    bias = tf.Variable(tf.zeros([filters]), name='bias')  
-    output = tf.nn.conv3d(input, filter, strides=(1,)+stride+(1,), padding='SAME')
-    return tf.nn.bias_add(output, bias)
-    
+   
 def getShape(input):
     shape = ()
     for i in input.shape:
         shape += (i.value,)
-    return shape
+    return shape[1:4]
     
 def maxPool3D(input, ksize, stride, padding='SAME'):
     output = tf.nn.max_pool3d(input,(1,)+ksize+(1,),(1,)+stride+(1,),'SAME')    
     return output, getShape(output)
 
+def conv3d(input, channels, filters, ksize, stride, padding='SAME'):
+    # input : b,d,h,w,in
+    # filter_shape : d,h,w,in,out
+    filter_shape = ksize + (channels, filters)    
+    filter = tf.Variable(tf.random_normal(filter_shape, stddev=0.1), name='filter')
+    bias = tf.Variable(tf.zeros([filters]), name='bias')  
+    output = tf.nn.conv3d(input, filter, strides=(1,)+stride+(1,), padding=padding)
+    return tf.nn.bias_add(output, bias)
+    
+def conv3d_Tr(input, channels, filters, output, ksize, stride, padding='SAME'):
+    # input : b,d,h,w,in
+    # filter_shape : d,h,w,out,in
+    # output : b,d,h,w,out
+    filter_shape = ksize + (filters, channels)
+    batch_size = tf.shape(input)[0]
+    output_shape = tf.stack((batch_size,)+(output)+(filters,))
+    filter = tf.Variable(tf.random_normal(filter_shape, stddev=0.1), name='filter')
+    bias = tf.Variable(tf.zeros([filters]), name='bias')  
+    output = tf.nn.conv3d_transpose(input, filter, output_shape, strides=(1,)+stride+(1,), padding=padding)
+    return tf.nn.bias_add(output, bias)
+
 
 #phase = tf.placeholder(tf.bool, name='phase')
 
 def batchNorm(input, training=True):
-    return tf.contrib.layers.batch_norm(input, decay=0.9, epsilon=1e-5,
+    out = tf.contrib.layers.batch_norm(input, decay=0.9, epsilon=1e-5,
                                         scale=True, is_training=training, scope=None)
+    return tf.nn.relu(out, 'ReLU')  
 
 def dense_batch_relu(x, phase, scope):
     with tf.variable_scope(scope):
@@ -90,22 +95,29 @@ def model(input, train=True):
         poolStride = (2,2,2)
         poolSize = (2,2,2)
         inputChannel = 1
-        #input = tf.placeholder('float32', [None, 20, 20, 20, 1])
+        input = tf.placeholder('float32', [None, 20, 20, 20, 1])
+        shape1 = getShape(input)
         conv1= conv3d(input, channels=inputChannel, filters=8, ksize=kSize3, stride=convStride)
         print('----------')
-        print(conv1.name)
-        #conv1, shape2 = maxPool3D(conv1,poolSize,poolStride,'SAME')
-        conv1 = batchNorm(conv1, training=train)
+        print(conv1.shape)
+        conv1, shape2 = maxPool3D(conv1,poolSize,poolStride,'SAME')
+        print('shape')
+        print(shape2)
+        conv1 = batchNorm(conv1, training=train) # with RELU
         #conv1 = batch_relu(conv1, phase=train,'BN')
-        conv1 = conv3d(conv1, channels=8, filters=16, ksize=kSize3, stride=convStride)
         print(conv1.shape)
-        conv1 = conv3d(conv1, channels=conv1.shape[4].value, filters=8, ksize=kSize3, stride=convStride)
+        conv1 = conv3d(conv1, channels=conv1.shape[4].value, filters=16, ksize=kSize3, stride=convStride)
         print(conv1.shape)
-        conv1 = conv3d(conv1, channels=conv1.shape[4].value, filters=2, ksize=kSize3, stride=convStride)
+        conv1 = batchNorm(conv1, training=train)  # with RELU
+        conv1 = conv3d_Tr(conv1, channels=conv1.shape[4].value, filters=8, output=shape1, ksize=kSize3, stride=poolStride)
         print(conv1.shape)
+        conv1 = batchNorm(conv1, training=train)  # with RELU
+        conv1 = conv3d(conv1, channels=conv1.shape[4].value, filters=3, ksize=kSize3, stride=convStride)
+        print(conv1.shape)
+        conv1 = tf.nn.softmax(conv1)
     return conv1
 
-          
+
 class BBB():
     def __init__(self, input):
         self.input = input
