@@ -171,10 +171,10 @@ class HVSMRdataset():
         print('fetching '+dataset+' rawdata from drive')
         # maxValue = 3300.0
         maxValue = 1.0
-        #segmentData_ = [self.padding(sitk.GetArrayFromImage(sitk.ReadImage(i)))/maxValue for i in segmentPath]  
-        #volumeData_ = [self.padding(sitk.GetArrayFromImage(sitk.ReadImage(i)))/maxValue for i in volumePath]  
-        segmentData_ = [self.resize(sitk.GetArrayFromImage(sitk.ReadImage(i)))/maxValue for i in segmentPath]  
-        volumeData_ = [self.resize(sitk.GetArrayFromImage(sitk.ReadImage(i)))/maxValue for i in volumePath] 
+        segmentData_ = [self.padding(sitk.GetArrayFromImage(sitk.ReadImage(i)))/maxValue for i in segmentPath]  
+        volumeData_ = [self.padding(sitk.GetArrayFromImage(sitk.ReadImage(i)))/maxValue for i in volumePath]  
+        #segmentData_ = [self.resize(sitk.GetArrayFromImage(sitk.ReadImage(i)))/maxValue for i in segmentPath]  
+        #volumeData_ = [self.resize(sitk.GetArrayFromImage(sitk.ReadImage(i)))/maxValue for i in volumePath] 
         #segmentData_ = [sitk.GetArrayFromImage(sitk.ReadImage(i))/maxValue for i in segmentPath]  
         #volumeData_ = [sitk.GetArrayFromImage(sitk.ReadImage(i))/maxValue for i in volumePath] 
         #segmentData_ = np.array(segmentData_)
