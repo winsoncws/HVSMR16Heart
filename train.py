@@ -32,10 +32,10 @@ if __name__ == '__main__':
     dataset = HVSMRdataset('./datasetHVSMR16Heart')
     assert dataset.AbleToRetrieveData(), 'not able to locate the directory of dataset'
     dataset.InitDataset(splitRatio=1.0, shuffle=True)         # Take everything 100%
-#    X_ph = tf.placeholder('float32', [None, 84, 256, 256, 1])  #float32
+    X_ph = tf.placeholder('float32', [None, 84, 256, 256, 1])  #float32
 #    y_ph = tf.placeholder('uint8', [None, 84, 256, 256, 1])
-    X_ph = tf.placeholder('float32', [None, None, None, None, 1], name='XX')  #float32
-    y_ph = tf.placeholder('uint8', [None, None, None, None, 1], name='YY')
+    #X_ph = tf.placeholder('float32', [None, None, None, None, 1])  #float32
+    y_ph = tf.placeholder('uint8', [None, None, None, None, 1])
     
     y_ph_cat = tf.one_hot(y_ph,3) # --> unstack into 3 categorical Tensor [?, 84, 256, 256, 1, 3]
     y_ph_cat = y_ph_cat[:,:,:,:,0,:]
@@ -80,7 +80,7 @@ if __name__ == '__main__':
     
     # model Saver
     #saver = tf.train.Saver()
-    #X_ph = tf.placeholder('float32', [None, None, None, None, 1])  #float32
+    X_ph = tf.placeholder('float32', [None, None, None, None, 1])  #float32
 
     
     #gpu_options=tf.GPUOptions(per_process_gpu_memory_fraction=0.9)
