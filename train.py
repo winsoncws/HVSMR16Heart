@@ -102,8 +102,8 @@ if __name__ == '__main__':
         X_test, y_test = dataset.NextBatch3D(10,dataset='validation')
              
         
-#        iter_train = tg.SequentialIterator(X_train, y_train, batchsize=batchsize)
-#        iter_test = tg.SequentialIterator(X_test, y_test, batchsize=batchsize)
+        iter_train = tg.SequentialIterator(X_train, y_train, batchsize=batchsize)
+        iter_test = tg.SequentialIterator(X_test, y_test, batchsize=batchsize)
         
         best_valid_accu = 0
         for epoch in range(max_epoch):
@@ -113,21 +113,23 @@ if __name__ == '__main__':
             ttl_examples = 0
             print('..training')
             
-            for i in range(10):
-                X_tr = X_train[i]
-                y_tr = y_train[i]
-                y_tr = np.array(y_tr, dtype='int8')
+            #for i in range(10):
+            for XX, yy in iter_train:
+#                X_tr = X_train[i]
+#                y_tr = y_train[i]
+#                y_tr = np.array(y_tr, dtype='int8')
+#                
+#                X_tr = X_tr.reshape((1,)+X_tr.shape+(1,))
+#                y_tr = y_tr.reshape((1,)+y_tr.shape+(1,))
+                feed_dict = {X_ph:XX, y_ph:yy, phase:1}
                 
-                X_tr = X_tr.reshape((1,)+X_tr.shape+(1,))
-                y_tr = y_tr.reshape((1,)+y_tr.shape+(1,))
-                feed_dict = {X_ph:X_tr, y_ph:y_tr, phase:1}
                 _, train_cost = sess.run([optimizer,train_cost_sb] , feed_dict=feed_dict)              
                 ttl_train_cost += train_cost
                 ttl_examples += 1
                 pbar.update(ttl_examples)
             mean_train_cost = ttl_train_cost/float(10)
             print('\ntrain cost', mean_train_cost)
-
+#
             ttl_valid_cost = 0
             ttl_valid_accu = 0
             tt_valid_0 = 0
@@ -136,12 +138,13 @@ if __name__ == '__main__':
             ttl_examples = 0
             pbar = tg.ProgressBar(10)
             print('..validating')
-            for i in range(10):
-                X_tr = X_train[i]
-                y_tr = y_train[i]
-                X_tr = X_tr.reshape((1,)+X_tr.shape+(1,))
-                y_tr = y_tr.reshape((1,)+y_tr.shape+(1,))
-                feed_dict = {X_ph:X_tr, y_ph:y_tr, phase:0}
+            #for i in range(10):
+            for XX, yy in iter_test:
+#                X_tr = X_train[i]
+#                y_tr = y_train[i]
+#                X_tr = X_tr.reshape((1,)+X_tr.shape+(1,))
+#                y_tr = y_tr.reshape((1,)+y_tr.shape+(1,))
+                feed_dict = {X_ph:XX, y_ph:yy, phase:0}
                 valid_cost, valid_accu, valid_0, valid_1, valid_2 = sess.run([test_cost_sb, test_accu_sb, valid_cost_back,
                                                                      valid_cost_label, valid_cost_others],
                                                                      feed_dict=feed_dict)

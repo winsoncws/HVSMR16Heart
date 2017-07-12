@@ -167,7 +167,7 @@ class HVSMRdataset():
         segmentPath = [segmentPath.format(str(i)+'-label') for i in batchPath_]
         volumePath = os.path.join(self.filepath,'TrainingDataset',self.filename[self.filetype])
         volumePath = [volumePath.format(i) for i in batchPath_]
-        
+        #
         print('fetching '+dataset+' rawdata from drive')
         # maxValue = 3300.0
         maxValue = 1.0
@@ -175,8 +175,10 @@ class HVSMRdataset():
         volumeData_ = [self.padding(sitk.GetArrayFromImage(sitk.ReadImage(i)))/maxValue for i in volumePath]  
         #segmentData_ = [sitk.GetArrayFromImage(sitk.ReadImage(i))/maxValue for i in segmentPath]  
         #volumeData_ = [sitk.GetArrayFromImage(sitk.ReadImage(i))/maxValue for i in volumePath] 
-        segmentData_ = np.array(segmentData_)
-        volumeData_ = np.array(volumeData_)
+        #segmentData_ = np.array(segmentData_)
+        #volumeData_ = np.array(volumeData_)
+        segmentData_ = np.array([i.reshape(i.shape+(1,)) for i in segmentData_])
+        volumeData_ = np.array([i.reshape(i.shape+(1,)) for i in volumeData_])
         return volumeData_, segmentData_
 
     
