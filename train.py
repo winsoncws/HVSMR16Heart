@@ -80,7 +80,7 @@ if __name__ == '__main__':
     
     # model Saver
     #saver = tf.train.Saver()
-    X_ph = tf.placeholder('float32', [None, None, None, None, 1])  #float32
+    #X_ph = tf.placeholder('float32', [None, None, None, None, 1])  #float32
 
     
     #gpu_options=tf.GPUOptions(per_process_gpu_memory_fraction=0.9)
