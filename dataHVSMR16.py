@@ -2,7 +2,8 @@ import os
 import SimpleITK as sitk
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.ndimage.interpolation import rotate
+#from scipy.ndimage.interpolation import rotate
+from scipy.misc import imresize
 import tensorflow as tf
 #import Augmentation
 
@@ -133,6 +134,9 @@ class HVSMRdataset():
         h2 = int(np.floor((dim[2]-dataShape[2])/2.0))
         return np.pad(x,[[d1,d2],[w1,w2],[h1,h2]],'constant')    
     
+    def resize(self,x,dim=(100,100,100)):
+        return imresize(x, dim, interp='bilinear', mode=None)
+    
     def __nextBatch(self,batchSize,dataset='train'):
         assert len(self.listFolder) > 0, 'Please initialize dataset first, by calling InitDataset()'
         if dataset == 'train':
@@ -175,17 +179,6 @@ class HVSMRdataset():
         volumeData_ = np.array(volumeData_)
         return volumeData_, segmentData_
 
-
-    def padding(self,x,dim=(84,256,256)):
-        dataShape = x.shape
-        d1 = int(np.ceil((dim[0]-dataShape[0])/2.0))
-        d2 = int(np.floor((dim[0]-dataShape[0])/2.0))
-        w1 = int(np.ceil((dim[1]-dataShape[1])/2.0))
-        w2 = int(np.floor((dim[1]-dataShape[1])/2.0))
-        h1 = int(np.ceil((dim[2]-dataShape[2])/2.0))
-        h2 = int(np.floor((dim[2]-dataShape[2])/2.0))
-        return np.pad(x,[[d1,d2],[w1,w2],[h1,h2]],'constant')
-    
     
     
     
