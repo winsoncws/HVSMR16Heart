@@ -93,7 +93,7 @@ if __name__ == '__main__':
         
         #dataset.InitDataset()  # Take everything 80% Train 20% Validation
         
-        batchsize = 2  # size=3
+        batchsize = 1  # size=3
         #######
         # Just to train 0 & 1, ignore 2=Other Pathology. Assign 2-->0
         # dataY[dataY ==2] = 0
@@ -108,7 +108,7 @@ if __name__ == '__main__':
         best_valid_accu = 0
         for epoch in range(max_epoch):
             print('epoch:', epoch)
-            pbar = tg.ProgressBar(10)
+            pbar = tg.ProgressBar(len(iter_train))
             ttl_train_cost = 0
             ttl_examples = 0
             print('..training')
