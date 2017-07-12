@@ -23,7 +23,7 @@ if __name__ == '__main__':
     
     learning_rate = 0.001
     
-    max_epoch = 100
+    max_epoch = 2
     es = tg.EarlyStopper(max_epoch=max_epoch,
                          epoch_look_back=4,
                          percent_decrease=0)
@@ -83,9 +83,9 @@ if __name__ == '__main__':
     #X_ph = tf.placeholder('float32', [None, None, None, None, 1])  #float32
 
     
-    #gpu_options=tf.GPUOptions(per_process_gpu_memory_fraction=0.9)
-    #with tf.Session(config = tf.ConfigProto(gpu_options = gpu_options)) as sess:
-    with tf.Session() as sess:
+    gpu_options=tf.GPUOptions(per_process_gpu_memory_fraction=0.9)
+    #with tf.Session() as sess:
+    with tf.Session(config = tf.ConfigProto(gpu_options = gpu_options)) as sess:
         init = tf.global_variables_initializer()
         sess.run(init)
         print("INITIALIZE SESSION")
@@ -180,13 +180,11 @@ if __name__ == '__main__':
         #predictIndex = sys.argv[1] # input from terminal
         for i in range(4):
             print('Prediction 3D Scan of No #'+str(i))        
-            intIndex = int(i)  
             X_tr = X_train[i]
             y_tr = y_train[i]
-            X_tr = X_tr.reshape((1,)+X_tr.shape+(1,))
-            y_tr = y_tr.reshape((1,)+y_tr.shape+(1,))
+            X_tr = X_tr.reshape((1,)+X_tr.shape)
+            y_tr = y_tr.reshape((1,)+y_tr.shape)
             feed_dict = {X_ph:X_tr, y_ph:y_tr, phase:0}        
-            
             mask_output = sess.run(y_test_sb, feed_dict=feed_dict)
     
             print('mask_outpt type')        
