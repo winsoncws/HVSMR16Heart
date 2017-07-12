@@ -4,13 +4,14 @@ Created on Tue Jun 20 12:24:48 2017
 
 @author: winsoncws
 """
-import sys
+import os
 import tensorgraph as tg
 import tensorflow as tf
 from tensorgraph.cost import entropy, accuracy, iou, smooth_iou
 from dataHVSMR16 import HVSMRdataset
+from scipy.ndimage.interpolation import rotate
 import model # all model
-from scipy.misc import imsave
+#from scipy.misc import imsave
 import numpy as np
 #from scipy.ndimage.interpolation import rotate
 
@@ -23,7 +24,7 @@ if __name__ == '__main__':
     
     learning_rate = 0.001
     
-    max_epoch = 100
+    max_epoch = 150
     es = tg.EarlyStopper(max_epoch=max_epoch,
                          epoch_look_back=4,
                          percent_decrease=0)
@@ -69,7 +70,6 @@ if __name__ == '__main__':
     valid_cost_others = (1 - smooth_iou(y_ph_cat[:,:,:,:,2] , y_test_sb[:,:,:,:,2]) )
     test_cost_sb = tf.reduce_sum([valid_cost_back*0.3,valid_cost_label * 0.4,valid_cost_others * 0.4]) 
     
-    
     # ACCURACY
     # CHANGE TO 2 CHANNELS    
     #test_accu_sb = iou(y_ph_cat[:,:,:,:,1:], y_test_sb, threshold=0.5)         # Works for Softmax filter2
@@ -100,7 +100,12 @@ if __name__ == '__main__':
         #######
         X_train, y_train = dataset.NextBatch3D(10,dataset='train')
         X_test, y_test = dataset.NextBatch3D(10,dataset='validation')
-             
+        
+        def Rotate3D(data, angle, axis):    
+            axis_ = [(1,2),(0,2),(0,1)]
+            return rotate(data,angle, axes=axis_[axis], reshape=False)
+            
+        X_train = np.array([Rotate3D()])
         
         iter_train = tg.SequentialIterator(X_train, y_train, batchsize=batchsize)
         iter_test = tg.SequentialIterator(X_test, y_test, batchsize=batchsize)
@@ -112,7 +117,6 @@ if __name__ == '__main__':
             ttl_train_cost = 0
             ttl_examples = 0
             print('..training')
-            
             #for i in range(10):
             for XX, yy in iter_train:
 #                X_tr = X_train[i]
@@ -140,10 +144,6 @@ if __name__ == '__main__':
             print('..validating')
             #for i in range(10):
             for XX, yy in iter_test:
-#                X_tr = X_train[i]
-#                y_tr = y_train[i]
-#                X_tr = X_tr.reshape((1,)+X_tr.shape+(1,))
-#                y_tr = y_tr.reshape((1,)+y_tr.shape+(1,))
                 feed_dict = {X_ph:XX, y_ph:yy, phase:0}
                 valid_cost, valid_0, valid_1, valid_2 = sess.run([test_cost_sb, valid_cost_back,
                                                                      valid_cost_label, valid_cost_others],
@@ -172,12 +172,16 @@ if __name__ == '__main__':
                 print('training done!')
                 break
         
-        #save_path = saver.save(sess, "./trainModel/model1/trained_model.ckpt")    
-        #print("Model saved in file: %s" % save_path)
+#        if not os.path.exists('./trained'):
+#            os.makedirs('./trained')
+#        save_path = saver.save(sess, "./trainModel/model1/trained_model.ckpt")    
+#        print("Model saved in file: %s" % save_path)
         
         
         ### 1ST PREDICTION
         #predictIndex = sys.argv[1] # input from terminal
+        if not os.path.exists('./sample'):
+            os.makedirs('./sample')
         for i in range(4):
             print('Prediction 3D Scan of No #'+str(i))        
             X_tr = X_train[i]
@@ -191,9 +195,9 @@ if __name__ == '__main__':
             print(type(mask_output))
             print(mask_output.shape)        
             
-            np.save('X_test_'+str(i)+'.npy',X_train[i])
-            np.save('y_test_'+str(i)+'.npy',y_train[i])
-            np.save('mask_output_'+str(i)+'.npy',mask_output[0])
+            np.save('./sample/X_test_'+str(i)+'.npy',X_train[i])
+            np.save('./sample/y_test_'+str(i)+'.npy',y_train[i])
+            np.save('./sample/mask_output_'+str(i)+'.npy',mask_output[0])
         
         
         

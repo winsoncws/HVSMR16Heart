@@ -19,8 +19,7 @@ from tensorgraph.layers import Conv3D, Conv2D, RELU, MaxPooling, LRN, Tanh, Drop
 import tensorflow as tf
 #from tensorgraph.cost import entropy, accuracy, iou, smooth_iou
 #from math import ceil
-from conv3D import Conv3D_Tranpose1, MaxPool3D, SoftMaxMultiDim, Residual3D, \
-InceptionResnet_3D, ResidualBlock3D
+from conv3D import Conv3D_Tranpose1, MaxPool3D, SoftMaxMultiDim
 
 from tensorflow.python.ops import gen_nn_ops
 
@@ -101,29 +100,33 @@ def model(input, train=True):
         kSize3 = (3,3,3)
         poolStride = (2,2,2)
         poolSize = (2,2,2)
-        inputChannel = 1
         #input = tf.placeholder('float32', [None, 20, 20, 20, 1])
         shape1 = getShape(input)
         print(shape1)
-        conv1= conv3d(input, channels=inputChannel, filters=8, ksize=kSize3, stride=convStride)
+        conv1= conv3d(input, channels=1, filters=8, ksize=kSize3, stride=convStride)
         print('----------')
         print(conv1.shape)
         conv1, shape2 = maxPool3D(conv1,poolSize,poolStride,'SAME')
         print(shape2)
-        conv1 = batchNorm(conv1, training=train) # with RELU
+        conv1 = tf.nn.relu(conv1)
+        #conv1 = batchNorm(conv1, training=train) # with RELU
         #conv1 = batch_relu(conv1, phase=train,'BN')
         print(conv1.shape)
         conv1 = conv3d(conv1, channels=conv1.shape[4].value, filters=16, ksize=kSize3, stride=convStride)
         print(conv1.shape)
         conv1, shape3 = maxPool3D(conv1,poolSize,poolStride,'SAME')
         print(shape2)
-        conv1 = batchNorm(conv1, training=train)  # with RELU
+        conv1 = tf.nn.relu(conv1)
+        #conv1 = batchNorm(conv1, training=train)  # with RELU
         conv1 = conv3d(conv1, channels=conv1.shape[4].value, filters=32, ksize=kSize3, stride=convStride)
+        conv1 = tf.nn.relu(conv1)
         conv1 = conv3d_Tr(conv1, channels=conv1.shape[4].value, filters=16, output=shape2, ksize=kSize3, stride=poolStride)
         print(conv1.shape)
-        conv1 = batchNorm(conv1, training=train)  # with RELU
+        conv1 = tf.nn.relu(conv1)
+        #conv1 = batchNorm(conv1, training=train)  # with RELU
         conv1 = conv3d_Tr(conv1, channels=conv1.shape[4].value, filters=8, output=shape1, ksize=kSize3, stride=poolStride)
-        conv1 = batchNorm(conv1, training=train)  # with RELU
+        conv1 = tf.nn.relu(conv1)
+        #conv1 = batchNorm(conv1, training=train)  # with RELU
         conv1 = conv3d(conv1, channels=conv1.shape[4].value, filters=3, ksize=kSize3, stride=convStride)
         print(conv1.shape)
         conv1 = tf.nn.softmax(conv1)
