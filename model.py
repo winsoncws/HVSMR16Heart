@@ -58,9 +58,11 @@ def conv3d_Tr(input, channels, filters, output, ksize, stride, padding='SAME'):
     batch_size = tf.shape(input)[0]
     d,h,w = output
     output_shape = tf.stack((batch_size,d,h,w,filters))
+    print('stacked')   
     filter = tf.Variable(tf.random_normal(filter_shape, stddev=0.1), name='filter')
     bias = tf.Variable(tf.zeros([filters]), name='bias')  
     output = tf.nn.conv3d_transpose(input, filter, output_shape, strides=(1,)+stride+(1,), padding=padding)
+    print('tranpose')    
     return tf.nn.bias_add(output, bias)
 
 
