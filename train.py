@@ -72,7 +72,7 @@ if __name__ == '__main__':
     
     # ACCURACY
     # CHANGE TO 2 CHANNELS    
-    test_accu_sb = iou(y_ph_cat[:,:,:,:,1:], y_test_sb, threshold=0.5)         # Works for Softmax filter2
+    #test_accu_sb = iou(y_ph_cat[:,:,:,:,1:], y_test_sb, threshold=0.5)         # Works for Softmax filter2
     
     print('DONE')    
 
@@ -145,19 +145,17 @@ if __name__ == '__main__':
 #                X_tr = X_tr.reshape((1,)+X_tr.shape+(1,))
 #                y_tr = y_tr.reshape((1,)+y_tr.shape+(1,))
                 feed_dict = {X_ph:XX, y_ph:yy, phase:0}
-                valid_cost, valid_accu, valid_0, valid_1, valid_2 = sess.run([test_cost_sb, test_accu_sb, valid_cost_back,
+                valid_cost, valid_0, valid_1, valid_2 = sess.run([test_cost_sb, valid_cost_back,
                                                                      valid_cost_label, valid_cost_others],
                                                                      feed_dict=feed_dict)
                 #mask_output = sess.run(y_test_sb, feed_dict=feed_dict)
                 ttl_valid_cost += valid_cost
-                ttl_valid_accu += valid_accu
                 tt_valid_0 += valid_0
                 tt_valid_1 += valid_1
                 tt_valid_2 += valid_2
                 ttl_examples += 1
                 pbar.update(ttl_examples)
             mean_valid_cost = ttl_valid_cost/float(ttl_examples)
-            mean_valid_accu = ttl_valid_accu/float(ttl_examples)
             mean_valid_0 = tt_valid_0/float(ttl_examples)
             mean_valid_1 = tt_valid_1/float(ttl_examples)
             mean_valid_2 = tt_valid_2/float(ttl_examples)
@@ -165,17 +163,11 @@ if __name__ == '__main__':
             #print('valid Background', mean_valid_0)
             print('valid Label1', mean_valid_1)
             print('valid Label2', mean_valid_2)
-            print('valid accu', mean_valid_accu)
-            
-            
-            if best_valid_accu < mean_valid_accu:
-                best_valid_accu = mean_valid_accu
 
             if es.continue_learning(valid_error=mean_valid_cost, epoch=epoch):
                 print('epoch', epoch)
                 print('best epoch last update:', es.best_epoch_last_update)
                 print('best valid last update:', es.best_valid_last_update)
-                print('best valid accuracy:', best_valid_accu)
             else:
                 print('training done!')
                 break
