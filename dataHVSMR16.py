@@ -63,11 +63,11 @@ def locateCenter(label):
 #showImage(data,segment,slice, cmap_='CMRmap')
 #showImage(data,segment,slice, cmap_='CMRmap', vmin=0 ,vmax=3000) # might need to do clipping
 #
-path = "axial_crop"
-for index in range(10):
-    volumeFile = "./datasetHVSMR16Heart/"+path+"/TrainingDataset/training_"+path+"_pat"
-    data = sitk.GetArrayFromImage(sitk.ReadImage(volumeFile+str(index)+'.nii.gz'))
-    print(data.shape)
+#path = "axial_crop"
+#for index in range(10):
+#    volumeFile = "./datasetHVSMR16Heart/"+path+"/TrainingDataset/training_"+path+"_pat"
+#    data = sitk.GetArrayFromImage(sitk.ReadImage(volumeFile+str(index)+'.nii.gz'))
+#    print(data.shape)
 
 
 class HVSMRdataset():
@@ -171,8 +171,10 @@ class HVSMRdataset():
         print('fetching '+dataset+' rawdata from drive')
         # maxValue = 3300.0
         maxValue = 1.0
-        segmentData_ = [self.padding(sitk.GetArrayFromImage(sitk.ReadImage(i)))/maxValue for i in segmentPath]  
-        volumeData_ = [self.padding(sitk.GetArrayFromImage(sitk.ReadImage(i)))/maxValue for i in volumePath]  
+        #segmentData_ = [self.padding(sitk.GetArrayFromImage(sitk.ReadImage(i)))/maxValue for i in segmentPath]  
+        #volumeData_ = [self.padding(sitk.GetArrayFromImage(sitk.ReadImage(i)))/maxValue for i in volumePath]  
+        segmentData_ = [self.resize(sitk.GetArrayFromImage(sitk.ReadImage(i)))/maxValue for i in segmentPath]  
+        volumeData_ = [self.resize(sitk.GetArrayFromImage(sitk.ReadImage(i)))/maxValue for i in volumePath] 
         #segmentData_ = [sitk.GetArrayFromImage(sitk.ReadImage(i))/maxValue for i in segmentPath]  
         #volumeData_ = [sitk.GetArrayFromImage(sitk.ReadImage(i))/maxValue for i in volumePath] 
         #segmentData_ = np.array(segmentData_)

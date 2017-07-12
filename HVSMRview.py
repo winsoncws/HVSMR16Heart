@@ -51,15 +51,15 @@ def showImage(data, segment, predict, slice=55, cmap_='hot', vmin=None, vmax=Non
         vmin = data.min()
     if vmax is None:
         vmax = data.max()
-    plt.imshow(data[:,:,slice], cmap=cmap_, vmin=vmin, vmax=vmax)
+    plt.imshow(data[:,:,slice,0], cmap=cmap_, vmin=vmin, vmax=vmax)
     plt.title('Img Dim {0}, slice {1}'.format(data.shape, slice))
     plt.subplot(2,2,2)
-    plt.imshow(segment[:,:,slice], vmin=0, vmax=2, cmap='hot')
+    plt.imshow(segment[:,:,slice,0], vmin=0, vmax=2, cmap='hot')
     plt.subplot(2,2,4)
     max_ = np.argmax(predict,3)
     plt.imshow(max_[:,:,slice], vmin=0, vmax=2, cmap='hot')
 
-index = 3
+index = 1
 data = np.load('./sample/X_test_{}.npy'.format(index))   # Only 2 channels
 segment = np.load('./sample/y_test_{}.npy'.format(index)) # Only 2 channels
 predict = np.load('./sample/mask_output_{}.npy'.format(index)) # Only 2 channels
