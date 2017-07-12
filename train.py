@@ -32,10 +32,10 @@ if __name__ == '__main__':
     dataset = HVSMRdataset('./datasetHVSMR16Heart')
     assert dataset.AbleToRetrieveData(), 'not able to locate the directory of dataset'
     dataset.InitDataset(splitRatio=1.0, shuffle=True)         # Take everything 100%
-    X_ph = tf.placeholder('float32', [None, 84, 256, 256, 1])  #float32
-#    y_ph = tf.placeholder('uint8', [None, 84, 256, 256, 1])
+    X_ph = tf.placeholder('float32', [None, 181, 239, 165, 1])  #float32
+    y_ph = tf.placeholder('uint8', [None, 181, 239, 165, 1])
     #X_ph = tf.placeholder('float32', [None, None, None, None, 1])  #float32
-    y_ph = tf.placeholder('uint8', [None, None, None, None, 1])
+    #y_ph = tf.placeholder('uint8', [None, None, None, None, 1])
     
     y_ph_cat = tf.one_hot(y_ph,3) # --> unstack into 3 categorical Tensor [?, 84, 256, 256, 1, 3]
     y_ph_cat = y_ph_cat[:,:,:,:,0,:]
