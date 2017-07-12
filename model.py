@@ -95,13 +95,12 @@ def model(input, train=True):
         poolStride = (2,2,2)
         poolSize = (2,2,2)
         inputChannel = 1
-        input = tf.placeholder('float32', [None, 20, 20, 20, 1])
+        #input = tf.placeholder('float32', [None, 20, 20, 20, 1])
         shape1 = getShape(input)
         conv1= conv3d(input, channels=inputChannel, filters=8, ksize=kSize3, stride=convStride)
         print('----------')
         print(conv1.shape)
         conv1, shape2 = maxPool3D(conv1,poolSize,poolStride,'SAME')
-        print('shape')
         print(shape2)
         conv1 = batchNorm(conv1, training=train) # with RELU
         #conv1 = batch_relu(conv1, phase=train,'BN')
