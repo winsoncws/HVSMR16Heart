@@ -23,7 +23,7 @@ if __name__ == '__main__':
     
     learning_rate = 0.001
     
-    max_epoch = 2
+    max_epoch = 100
     es = tg.EarlyStopper(max_epoch=max_epoch,
                          epoch_look_back=4,
                          percent_decrease=0)
