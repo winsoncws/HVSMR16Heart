@@ -93,7 +93,7 @@ if __name__ == '__main__':
         
         #dataset.InitDataset()  # Take everything 80% Train 20% Validation
         
-        batchsize = 1  # size=3
+        batchsize = 2  # size=3
         #######
         # Just to train 0 & 1, ignore 2=Other Pathology. Assign 2-->0
         # dataY[dataY ==2] = 0
